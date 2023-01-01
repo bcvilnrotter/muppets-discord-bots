@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 # argument parser
 arg_desc = '''\
-Python Discord Bot code for beaker-bot
+Python Discord Bot code for bunsen-bot
 --------------------------------------
 '''
 
@@ -15,7 +15,7 @@ Python Discord Bot code for beaker-bot
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=arg_desc)
 
 # add the argument to include TOKEN file location for beeker-bot
-parser.add_argument('--token', dest='token', help='path to where the bot TOKEN is found for beaker_bot')
+parser.add_argument('--token', dest='token', help='path to where the bot TOKEN is found for bunsen-bot')
 
 # parse the arguments
 args = parser.parse_args()
@@ -43,14 +43,8 @@ def read_token(token_path):
 
 load_dotenv()
 
-# initialize list of responses to @ messages
-responses = [
-    '<@1058656154928025620> Meep!',
-    '<@1058656154928025620> Mee-moop?'
-]
-
 # initialize client variable
-beaker_client = discord.Bot()
+bunsen_client = discord.Bot()
 
 # collect the token for beaker-bot
 token = read_token(args.token)
@@ -67,27 +61,32 @@ def log(message, type='info'):
     # print the log entry to console
     print(entry)
 
-@beaker_client.event
+@bunsen_client.event
 async def on_message(message):
     
     # log the message content
     log('  author: ' + str(message.author) + ' ; content: '+ message.content)
 
     # check if the content of the message contains an @ to beaker-bot
-    if '<@1058619141042483240>' in message.content:
+    if str(message.author) == 'beaker-bot#8957':
         
-        # randomly choose a response from the list of responses
-        response = random.choice(responses)
+        # check if beaker-bot responds with 'Meep!'
+        if 'Meep!' in message.content:
 
-        # relay the response to the discord server
-        await message.reply(response)
+            # give bunsen-bots response
+            await message.reply('He says hello and wishes you are doing well!')
+        
+        elif 'Mee-moop?' in message.content:
+
+            # give bunsen-bots response
+            await message.reply('He gives you his greetings, and asks how you are doing?')
 
 # function to ready the bot
-@beaker_client.event
+@bunsen_client.event
 async def on_ready():
     
     # print a statment that the bot is ready to be awoken
     log('Bot awoken!')
 
 # awaken the bot
-beaker_client.run(token)
+bunsen_client.run(token)
