@@ -41,8 +41,6 @@ def read_token(token_path):
     # return the TOKEN value
     return token
 
-load_dotenv()
-
 # initialize client variable
 bunsen_client = discord.Bot()
 

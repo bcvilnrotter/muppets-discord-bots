@@ -1,9 +1,8 @@
 # import modules
-import os, argparse, random
+import os, argparse, random, time
 import discord
 from datetime import datetime, timezone
 from discord.ext import commands
-from dotenv import load_dotenv
 
 # argument parser
 arg_desc = '''\
@@ -41,8 +40,6 @@ def read_token(token_path):
     # return the TOKEN value
     return token
 
-load_dotenv()
-
 # initialize list of responses to @ messages
 responses = [
     '<@1058656154928025620> Meep!',
@@ -67,6 +64,7 @@ def log(message, type='info'):
     # print the log entry to console
     print(entry)
 
+# main function for collecting events
 @beaker_client.event
 async def on_message(message):
     
@@ -81,6 +79,19 @@ async def on_message(message):
 
         # relay the response to the discord server
         await message.reply(response)
+
+# set command for 'countdown'
+@beaker_client.command()
+async def countdown(ctx, hour: int, minute: int, second: int):
+
+    # convert the time provided into a single value
+    total_time = 3600*hour + 60*minute + second
+
+    # add the time provided to the current time
+    timestamp = int(time.time()) + total_time
+    
+    # post a timer based on the timestamp
+    await ctx.respond(f'<t:{timestamp}:R>', delete_after=timestamp)
 
 # function to ready the bot
 @beaker_client.event
