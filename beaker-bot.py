@@ -15,6 +15,8 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
 
 # add the argument to include TOKEN file location for beeker-bot
 parser.add_argument('--token', dest='token', help='path to where the bot TOKEN is found for beaker_bot')
+parser.add_argument('--bunsen_bot', dest='bunsen', default=1058656154928025620, help='bunsen-bot id')
+parser.add_argument('--beaker_bot', dest='beaker', default=1058619141042483240, help='beaker-bot id')
 
 # parse the arguments
 args = parser.parse_args()
@@ -42,12 +44,18 @@ def read_token(token_path):
 
 # initialize list of responses to @ messages
 responses = [
-    '<@1058656154928025620> Meep!',
-    '<@1058656154928025620> Mee-moop?'
+    'Meep!',
+    'Mee-moop?'
 ]
 
+# initialize intents
+intents = discord.Intents.default()
+intents.presences = True
+intents.members = True
+intents.messages = True
+
 # initialize client variable
-beaker_client = discord.Bot()
+client = discord.Bot(intents=intents)
 
 # collect the token for beaker-bot
 token = read_token(args.token)
@@ -65,23 +73,31 @@ def log(message, type='info'):
     print(entry)
 
 # main function for collecting events
-@beaker_client.event
+@client.event
 async def on_message(message):
     
     # log the message content
     log('  author: ' + str(message.author) + ' ; content: '+ message.content)
 
     # check if the content of the message contains an @ to beaker-bot
-    if '<@1058619141042483240>' in message.content:
+    if '<@'+ str(args.beaker) + '>' in message.content:
         
-        # randomly choose a response from the list of responses
-        response = random.choice(responses)
+        # check if bunsen-bot is online
+        if (client.guilds[0].get_member(args.bunsen).status == discord.Status.offline):
+
+            # randomly give a response
+            response = random.choice(responses)
+
+        else:
+
+            # randomly choose a response from the list of responses
+            response = '<@' + str(args.bunsen) + '>' + random.choice(responses)
 
         # relay the response to the discord server
         await message.reply(response)
 
 # set command for 'countdown'
-@beaker_client.command()
+@client.command()
 async def countdown(ctx, hour: int, minute: int, second: int):
 
     # convert the time provided into a single value
@@ -94,11 +110,11 @@ async def countdown(ctx, hour: int, minute: int, second: int):
     await ctx.respond(f'<t:{timestamp}:R>', delete_after=timestamp)
 
 # function to ready the bot
-@beaker_client.event
+@client.event
 async def on_ready():
     
     # print a statment that the bot is ready to be awoken
     log('Bot awoken!')
 
 # awaken the bot
-beaker_client.run(token)
+client.run(token)
